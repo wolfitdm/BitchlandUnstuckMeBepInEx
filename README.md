@@ -1,3 +1,9 @@
 BitchLand BitchLand Unstuck Me BepInEx Version
 
-Press X to move again, press X if you are stuck.
+if you can not grab/equip anything
+
+PRESS Y
+
+Press Y to move again, press Y if you are stuck.
+
+ITS A REAL UNSTUCK MOD, NOT THE F8 TELEPORT shit.............

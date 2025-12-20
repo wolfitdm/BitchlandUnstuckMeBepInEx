@@ -4,6 +4,7 @@ using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using Den.Tools;
 using HarmonyLib;
+using HarmonyLib.Tools;
 using SemanticVersioning;
 using System;
 using System;
@@ -53,30 +54,190 @@ namespace BitchlandUnstuckMeBepInEx
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
 
-        [HarmonyPatch(typeof(Person), "SleepOnFloor")]
+        [HarmonyPatch(typeof(bl_ThirdPersonUserControl), "Update")]
         [HarmonyPrefix] // call after the original method is called
-        public static bool SleepOnFloor(object __instance)
+        public static bool bl_ThirdPersonUserControl_Update(object __instance)
         {
             if (!enableThisMod)
             {
                 return true;
             }
 
-            Main.Instance.Player.RunBlockers = new List<string>();
-            Main.Instance.Player.MoveBlockers = new List<string>();
-            Main.Instance.Player.ThisPersonInt.InteractBlockers = new List<string>();
-            Main.Instance.Player.CanMove = true;
-            Main.Instance.Player.InteractingWith.CanLeave = true;
-            Main.Instance.Player.Interacting = false;
-            Main.Instance.Player.InCombat = false;
-            Main.Instance.CanSaveFlags.Remove("CantMoveNow");
-            Main.Instance.CanSaveFlags = Main.Instance.CanSaveFlags;
-            Main.Instance.GameplayMenu.SleepMenu.SetActive(false);
-            Main.Instance.GameplayMenu.EscMenu.SetActive(false);
-            Main.Instance.GameplayMenu.TextInputMenu.SetActive(false);
-            Main.Instance.GameplayMenu.TraderMenu.SetActive(false);
-            Main.Instance.GameplayMenu.EnableMove();
-            Main.Instance.GameplayMenu.AllowCursor();
+            bool isKeyYUp = false;
+
+            try
+            {
+                isKeyYUp = Input.GetKeyUp(KeyCode.Y);
+            }
+            catch (Exception ex)
+            {
+                isKeyYUp = false;
+            }
+
+            if (!isKeyYUp)
+            {
+                return true;
+            }
+
+            try
+            {
+                Main.Instance.Player.RunBlockers.Clear();
+            }
+            catch
+            {
+
+                try
+                {
+                    Main.Instance.Player.RunBlockers = new List<string>();
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+            try
+            {
+                Main.Instance.Player.MoveBlockers.Clear();
+            }
+            catch
+            {
+
+                try
+                {
+                    Main.Instance.Player.MoveBlockers = new List<string>();
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+            try
+            {
+                Main.Instance.Player.ThisPersonInt.InteractBlockers.Clear();
+            }
+            catch
+            {
+
+                try
+                {
+                    Main.Instance.Player.ThisPersonInt.InteractBlockers = new List<string>();
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+
+            try
+            {
+                Main.Instance.Player.CanMove = true;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.InteractingWith.CanLeave = true;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.Interacting = false;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.InCombat = false;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.CanSaveFlags.Remove("CantMoveNow");
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Main.Instance.CanSaveFlags = Main.Instance.CanSaveFlags;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.SleepMenu.SetActive(false);
+            }
+            catch (Exception e)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.EscMenu.SetActive(false);
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.TextInputMenu.SetActive(false);
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.TraderMenu.SetActive(false);
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.EnableMove();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.AllowCursor();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME!");
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Logger.LogInfo("UNSTUCK ME REALLLY!");
+            }
+            catch (Exception ex)
+            {
+            }
 
             return true;
         }
