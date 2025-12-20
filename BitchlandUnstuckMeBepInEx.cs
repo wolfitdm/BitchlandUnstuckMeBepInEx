@@ -53,7 +53,7 @@ namespace BitchlandUnstuckMeBepInEx
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
 
-        [HarmonyPatch(typeof(Person), "SleepOnFloor")]
+        [HarmonyPatch(typeof(bl_ThirdPersonUserControl), "Update")]
         [HarmonyPrefix] // call after the original method is called
         public static bool SleepOnFloor(object __instance)
         {
@@ -62,21 +62,26 @@ namespace BitchlandUnstuckMeBepInEx
                 return true;
             }
 
-            Main.Instance.Player.RunBlockers = new List<string>();
-            Main.Instance.Player.MoveBlockers = new List<string>();
-            Main.Instance.Player.ThisPersonInt.InteractBlockers = new List<string>();
-            Main.Instance.Player.CanMove = true;
-            Main.Instance.Player.InteractingWith.CanLeave = true;
-            Main.Instance.Player.Interacting = false;
-            Main.Instance.Player.InCombat = false;
-            Main.Instance.CanSaveFlags.Remove("CantMoveNow");
-            Main.Instance.CanSaveFlags = Main.Instance.CanSaveFlags;
-            Main.Instance.GameplayMenu.SleepMenu.SetActive(false);
-            Main.Instance.GameplayMenu.EscMenu.SetActive(false);
-            Main.Instance.GameplayMenu.TextInputMenu.SetActive(false);
-            Main.Instance.GameplayMenu.TraderMenu.SetActive(false);
-            Main.Instance.GameplayMenu.EnableMove();
-            Main.Instance.GameplayMenu.AllowCursor();
+            if (Input.GetKeyUp(KeyCode.Y))
+            {
+                Main.Instance.Player.RunBlockers = new List<string>();
+                Main.Instance.Player.MoveBlockers = new List<string>();
+                Main.Instance.Player.ThisPersonInt.InteractBlockers = new List<string>();
+                Main.Instance.Player.CanMove = true;
+                Main.Instance.Player.InteractingWith.CanLeave = true;
+                Main.Instance.Player.Interacting = false;
+                Main.Instance.Player.InCombat = false;
+                Main.Instance.CanSaveFlags.Remove("CantMoveNow");
+                Main.Instance.CanSaveFlags = Main.Instance.CanSaveFlags;
+                Main.Instance.GameplayMenu.SleepMenu.SetActive(false);
+                Main.Instance.GameplayMenu.EscMenu.SetActive(false);
+                Main.Instance.GameplayMenu.TextInputMenu.SetActive(false);
+                Main.Instance.GameplayMenu.TraderMenu.SetActive(false);
+                Main.Instance.GameplayMenu.EnableMove();
+                Main.Instance.GameplayMenu.AllowCursor();
+                Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME!");
+                Logger.LogInfo("UNSTUCK ME REALLLY!");
+            }
 
             return true;
         }
