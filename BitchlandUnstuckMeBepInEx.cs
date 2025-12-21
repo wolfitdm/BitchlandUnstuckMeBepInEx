@@ -54,7 +54,7 @@ namespace BitchlandUnstuckMeBepInEx
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
 
-        [HarmonyPatch(typeof(bl_ThirdPersonUserControl), "Update")]
+        [HarmonyPatch(typeof(UI_Gameplay), "Update")]
         [HarmonyPrefix] // call after the original method is called
         public static bool bl_ThirdPersonUserControl_Update(object __instance)
         {
@@ -226,6 +226,37 @@ namespace BitchlandUnstuckMeBepInEx
             try
             {
                 Main.Instance.GameplayMenu.EndChat();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.UnstuckPlayer();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.m_Character.m_Animator.SetFloat("Forward", 0.5f);
+            } catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.m_Character.m_Animator.SetFloat("Turn", 0.5f);
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.m_Character.m_Rigidbody.velocity = Vector3.one;
             }
             catch (Exception ex)
             {
