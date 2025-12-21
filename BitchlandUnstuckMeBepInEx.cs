@@ -225,6 +225,14 @@ namespace BitchlandUnstuckMeBepInEx
 
             try
             {
+                Main.Instance.GameplayMenu.EndChat();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
                 Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME!");
             }
             catch (Exception ex)
