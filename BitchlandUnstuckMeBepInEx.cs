@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
 using UnityEngine;
 using UnityEngine;
 
@@ -54,6 +55,12 @@ namespace BitchlandUnstuckMeBepInEx
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
 
+        private static Vector3 explorerSpawnPoint = new Vector3(-2.949118f, 1.192093E-07f, 39.10889f);
+        private static Vector3 explorerSpawnPoint2 = new Vector3(179.8053f, 0.05544382f, -73.4415f);
+        private static Vector3 hardcoreSpawnPoint = new Vector3(-69f, 0.0f, 10f);
+        private static Vector3 hardcoreSpawnPoint2 = new Vector3(-49.10827f, 3.067196f, 14.40517f);
+        private static Vector3[] safeSpawnPoints = new Vector3[4];
+
         [HarmonyPatch(typeof(UI_Gameplay), "Update")]
         [HarmonyPrefix] // call after the original method is called
         public static bool bl_ThirdPersonUserControl_Update(object __instance)
@@ -64,6 +71,7 @@ namespace BitchlandUnstuckMeBepInEx
             }
 
             bool isKeyYUp = false;
+            bool isKeyF12Up = false;
 
             try
             {
@@ -74,8 +82,38 @@ namespace BitchlandUnstuckMeBepInEx
                 isKeyYUp = false;
             }
 
-            if (!isKeyYUp)
+            try
             {
+                isKeyF12Up = Input.GetKeyUp(KeyCode.F12);
+            }
+            catch (Exception ex)
+            {
+                isKeyF12Up = false;
+            }
+
+            if (!isKeyYUp && !isKeyF12Up)
+            {
+                return true;
+            }
+
+            if (isKeyF12Up)
+            {
+                try
+                {
+                    Vector3 lastSpawnPoint = Main.Instance.Player.transform.position;
+                    //Main.Instance.GameplayMenu.ShowNotification(lastSpawnPoint.x.ToString() + " " + lastSpawnPoint.y.ToString() + " " + lastSpawnPoint.z.ToString());
+                    safeSpawnPoints[0] = explorerSpawnPoint;
+                    safeSpawnPoints[1] = explorerSpawnPoint2;
+                    safeSpawnPoints[2] = hardcoreSpawnPoint;
+                    safeSpawnPoints[3] = hardcoreSpawnPoint2;
+                    int index = UnityEngine.Random.Range(0, safeSpawnPoints.Length);
+                    Vector3 spawnPoint = safeSpawnPoints[index];
+                    Main.Instance.Player.transform.position = spawnPoint;
+                   // Main.Instance.GameplayMenu.ShowNotification(lastSpawnPoint.x.ToString() + " " + lastSpawnPoint.y.ToString() + " " + lastSpawnPoint.z.ToString());
+                }
+                catch (Exception ex)
+                {
+                }
                 return true;
             }
 
@@ -264,21 +302,23 @@ namespace BitchlandUnstuckMeBepInEx
 
             try
             {
-                Main.Instance.PeopleFollowingPlayer.Clear();
+                if (Main.Instance.PeopleFollowingPlayer.Count > 0)
+                {
+                    Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME 2.0 Following Player ");
+                    int index = Main.Instance.PeopleFollowingPlayer.Count - 1;
+                    if (Main.Instance.Player.transform != null && Main.Instance.PeopleFollowingPlayer[index].transform != null)
+                    {
+                        Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME MINI F8 2.0 Following Player ");
+                        Main.Instance.PeopleFollowingPlayer[index].transform.position = Main.Instance.Player.transform.position;
+                    }
+                }
             } catch (Exception ex)
             {
-                try
-                {
-                    Main.Instance.PeopleFollowingPlayer = new List<Person>();
-                }
-                catch (Exception e)
-                {
-                }
             }
 
             try
             {
-                Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME 2.0!");
+                Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME 3.0!");
             }
             catch (Exception ex)
             {
