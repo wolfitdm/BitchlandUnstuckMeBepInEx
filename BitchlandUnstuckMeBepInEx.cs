@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization.Json;
-using UnityEngine;
+using UMA.Examples;
 using UnityEngine;
 
 namespace BitchlandUnstuckMeBepInEx
@@ -72,6 +72,7 @@ namespace BitchlandUnstuckMeBepInEx
 
             bool isKeyYUp = false;
             bool isKeyF12Up = false;
+            bool isKeyZUp = false;
 
             try
             {
@@ -84,6 +85,15 @@ namespace BitchlandUnstuckMeBepInEx
 
             try
             {
+                isKeyZUp = Input.GetKeyUp(KeyCode.Z);
+            }
+            catch (Exception ex)
+            {
+                isKeyZUp = false;
+            }
+
+            try
+            {
                 isKeyF12Up = Input.GetKeyUp(KeyCode.F12);
             }
             catch (Exception ex)
@@ -91,8 +101,18 @@ namespace BitchlandUnstuckMeBepInEx
                 isKeyF12Up = false;
             }
 
-            if (!isKeyYUp && !isKeyF12Up)
+            if (!isKeyYUp && !isKeyF12Up && !isKeyZUp)
             {
+                return true;
+            }
+
+            if (isKeyZUp) {
+                try
+                {
+                    Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME 4.0 Save to autosave, everytime...It's not guaranteed that this is safe...");
+                    Main.Instance.SaveGame(true);
+                } catch (Exception ex) {
+                }
                 return true;
             }
 
@@ -295,6 +315,37 @@ namespace BitchlandUnstuckMeBepInEx
             try
             {
                 Main.Instance.Player.UserControl.m_Character.m_Rigidbody.velocity = Vector3.one;
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                UI_Gameplay _this = (UI_Gameplay)__instance;
+                try
+                {
+                    _this.CloseStorage();
+                }
+                catch (Exception ex)
+                {
+                }
+
+                try
+                {
+                    _this.CloseEscMenu();
+                }
+                catch (Exception ex)
+                {
+                }
+
+                try
+                {
+                    _this.CloseJournal();
+                }
+                catch (Exception ex)
+                {
+                }
             }
             catch (Exception ex)
             {
