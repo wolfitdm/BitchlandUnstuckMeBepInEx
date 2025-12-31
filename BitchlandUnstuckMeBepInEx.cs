@@ -54,6 +54,55 @@ namespace BitchlandUnstuckMeBepInEx
 
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
+        public static GameObject getInteract()
+        {
+            try
+            {
+                if (Main.Instance.Player == null || Main.Instance.Player.WeaponInv == null || Main.Instance.Player.WeaponInv.IntLookingAt == null)
+                {
+                    return null;
+                }
+
+                Interactible la = Main.Instance.Player.WeaponInv.IntLookingAt;
+
+                if (la != null)
+                {
+                    GameObject ga = la.gameObject;
+                    return ga;
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            return null;
+        }
+
+        public static GameObject getPersonInteract()
+        {
+            GameObject ga = getInteract();
+
+            if (ga == null)
+            {
+                return null;
+            }
+
+            Interactible la = ga.GetComponent<Interactible>();
+
+            if (la != null)
+            {
+                if (la is int_Person)
+                {
+                    int_Person int_thisPerson = (int_Person)la;
+                    if (int_thisPerson.ThisPerson != null)
+                    {
+                        Person thisPerson = int_thisPerson.ThisPerson;
+                        return thisPerson.gameObject;
+                    }
+                }
+            }
+
+            return null;
+        }
 
         private static Vector3 explorerSpawnPoint = new Vector3(-2.949118f, 1.192093E-07f, 39.10889f);
         private static Vector3 explorerSpawnPoint2 = new Vector3(179.8053f, 0.05544382f, -73.4415f);
@@ -135,6 +184,45 @@ namespace BitchlandUnstuckMeBepInEx
                 {
                 }
                 return true;
+            }
+
+            try
+            {
+                GameObject personGa = getPersonInteract();
+                if (personGa != null)
+                {
+                    Main.Instance.GameplayMenu.ShowNotification("unstuck me from the chat");
+                    Person person = personGa.GetComponent<Person>();
+                    if (person != null)
+                    {
+                        Main.Instance.GameplayMenu.ShowNotification("unstuck me from the chat really");
+                        int_Person personInt = person.ThisPersonInt;
+                        if (personInt != null)
+                        {
+                            Main.Instance.GameplayMenu.ShowNotification("unstuck me from the chat really really");
+                            personInt.EndTheChat();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.enabled = true;
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                Main.Instance.Player.UserControl.ThirdCamPositionType = Main.Instance.Player.UserControl.ThirdCamPositionTypeOnSettings;
+            }
+            catch
+            {
             }
 
             try
@@ -300,7 +388,8 @@ namespace BitchlandUnstuckMeBepInEx
             try
             {
                 Main.Instance.Player.UserControl.m_Character.m_Animator.SetFloat("Forward", 0.5f);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
             }
 
@@ -322,7 +411,7 @@ namespace BitchlandUnstuckMeBepInEx
 
             try
             {
-                UI_Gameplay _this = (UI_Gameplay)__instance;
+                UI_Gameplay _this = (UI_Gameplay)Main.Instance.GameplayMenu;
                 try
                 {
                     _this.CloseStorage();
@@ -356,14 +445,17 @@ namespace BitchlandUnstuckMeBepInEx
                 if (Main.Instance.PeopleFollowingPlayer.Count > 0)
                 {
                     Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME 2.0 Following Player ");
-                    int index = Main.Instance.PeopleFollowingPlayer.Count - 1;
-                    if (Main.Instance.Player.transform != null && Main.Instance.PeopleFollowingPlayer[index].transform != null)
+                    for (int i = 0; i < Main.Instance.PeopleFollowingPlayer.Count; i++)
                     {
-                        Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME MINI F8 2.0 Following Player ");
-                        Main.Instance.PeopleFollowingPlayer[index].transform.position = Main.Instance.Player.transform.position;
+                        if (Main.Instance.Player.transform != null && Main.Instance.PeopleFollowingPlayer[i].transform != null)
+                        {
+                            Main.Instance.GameplayMenu.ShowNotification("UNSTUCK ME MINI F8 2.0 Following Player ");
+                            Main.Instance.PeopleFollowingPlayer[i].transform.position = Main.Instance.Player.transform.position;
+                        }
                     }
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
             }
 
