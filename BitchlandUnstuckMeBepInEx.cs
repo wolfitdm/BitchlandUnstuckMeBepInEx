@@ -24,6 +24,17 @@ namespace BitchlandUnstuckMeBepInEx
 
         private ConfigEntry<bool> configEnableMe;
 
+        public static void BL_CloseEscMenu()
+        {
+            Main.Instance.GameplayMenu.OpenEscMenu();
+            Main.Instance.GameplayMenu.CloseEscMenu();
+        }
+        public static void BL_CloseJournal()
+        {
+            Main.Instance.GameplayMenu.OpenJournal();
+            Main.Instance.GameplayMenu.CloseJournal();
+        }
+
         public BitchlandUnstuckMeBepInEx()
         {
         }
@@ -422,7 +433,7 @@ namespace BitchlandUnstuckMeBepInEx
 
                 try
                 {
-                    _this.CloseEscMenu();
+                    BL_CloseEscMenu();
                 }
                 catch (Exception ex)
                 {
@@ -430,7 +441,7 @@ namespace BitchlandUnstuckMeBepInEx
 
                 try
                 {
-                    _this.CloseJournal();
+                    BL_CloseJournal();
                 }
                 catch (Exception ex)
                 {
