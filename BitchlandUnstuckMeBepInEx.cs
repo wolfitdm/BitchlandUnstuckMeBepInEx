@@ -61,10 +61,158 @@ namespace BitchlandUnstuckMeBepInEx
 
             enableThisMod = configEnableMe.Value;
 
-            Harmony.CreateAndPatchAll(typeof(BitchlandUnstuckMeBepInEx));
+            PatchAllHarmonyMethods();
 
             Logger.LogInfo($"Plugin BitchlandUnstuckMeBepInEx BepInEx is loaded!");
         }
+
+        public static void PatchAllHarmonyMethods()
+        {
+            if (!enableThisMod)
+            {
+                return;
+            }
+
+            try
+            {
+                PatchHarmonyMethodUnity(typeof(UI_Gameplay), "Update", "bl_ThirdPersonUserControl_Update", true, false);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex.ToString());
+            }
+        }
+
+        public static void PatchHarmonyMethodUnity(Type originalClass, string originalMethodName, string patchedMethodName, bool usePrefix, bool usePostfix, Type[] parameters = null)
+        {
+            string uniqueId = "com.wolfitdm.BitchlandUnstuckMeBepInEx";
+            Type uniqueType = typeof(BitchlandUnstuckMeBepInEx);
+
+            // Create a new Harmony instance with a unique ID
+            var harmony = new Harmony(uniqueId);
+
+            if (originalClass == null)
+            {
+                Logger.LogInfo($"GetType originalClass == null");
+                return;
+            }
+
+            MethodInfo patched = null;
+
+            try
+            {
+                patched = AccessTools.Method(uniqueType, patchedMethodName);
+            }
+            catch (Exception ex)
+            {
+                patched = null;
+            }
+
+            if (patched == null)
+            {
+                Logger.LogInfo($"AccessTool.Method patched {patchedMethodName} == null");
+                return;
+
+            }
+
+            // Or apply patches manually
+            MethodInfo original = null;
+
+            try
+            {
+                if (parameters == null)
+                {
+                    original = AccessTools.Method(originalClass, originalMethodName);
+                }
+                else
+                {
+                    original = AccessTools.Method(originalClass, originalMethodName, parameters);
+                }
+            }
+            catch (AmbiguousMatchException ex)
+            {
+                Type[] nullParameters = new Type[] { };
+                try
+                {
+                    if (patched == null)
+                    {
+                        parameters = nullParameters;
+                    }
+
+                    ParameterInfo[] parameterInfos = patched.GetParameters();
+
+                    if (parameterInfos == null || parameterInfos.Length == 0)
+                    {
+                        parameters = nullParameters;
+                    }
+
+                    List<Type> parametersN = new List<Type>();
+
+                    for (int i = 0; i < parameterInfos.Length; i++)
+                    {
+                        ParameterInfo parameterInfo = parameterInfos[i];
+
+                        if (parameterInfo == null)
+                        {
+                            continue;
+                        }
+
+                        if (parameterInfo.Name == null)
+                        {
+                            continue;
+                        }
+
+                        if (parameterInfo.Name.StartsWith("__"))
+                        {
+                            continue;
+                        }
+
+                        Type type = parameterInfos[i].ParameterType;
+
+                        if (type == null)
+                        {
+                            continue;
+                        }
+
+                        parametersN.Add(type);
+                    }
+
+                    parameters = parametersN.ToArray();
+                }
+                catch (Exception ex2)
+                {
+                    parameters = nullParameters;
+                }
+
+                try
+                {
+                    original = AccessTools.Method(originalClass, originalMethodName, parameters);
+                }
+                catch (Exception ex2)
+                {
+                    original = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                original = null;
+            }
+
+            if (original == null)
+            {
+                Logger.LogInfo($"AccessTool.Method original {originalMethodName} == null");
+                return;
+            }
+
+            HarmonyMethod patchedMethod = new HarmonyMethod(patched);
+            var prefixMethod = usePrefix ? patchedMethod : null;
+            var postfixMethod = usePostfix ? patchedMethod : null;
+
+            harmony.Patch(original,
+                prefix: prefixMethod,
+                postfix: postfixMethod);
+        }
+
         public static GameObject getInteract()
         {
             try
@@ -120,9 +268,6 @@ namespace BitchlandUnstuckMeBepInEx
         private static Vector3 hardcoreSpawnPoint = new Vector3(-69f, 0.0f, 10f);
         private static Vector3 hardcoreSpawnPoint2 = new Vector3(-49.10827f, 3.067196f, 14.40517f);
         private static Vector3[] safeSpawnPoints = new Vector3[4];
-
-        [HarmonyPatch(typeof(UI_Gameplay), "Update")]
-        [HarmonyPrefix] // call after the original method is called
         public static bool bl_ThirdPersonUserControl_Update(object __instance)
         {
             if (!enableThisMod)
